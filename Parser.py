@@ -9,40 +9,52 @@ varName = []
 varValue = []
 arrayIterator = 0
 lineNumber = 0
+textFile = 'file.txt'
+
+def main(): #iterate through lines of textfile
+	
+	lineNumber = 0 
+	f = open(textFile)
+
+	for i in range(300):
+		
+		getNextLine(f.next())
+	 
+f.close()
 
 def getNextLine(line):
 
-    if mainDeclared == False:
+    if mainDeclared == False: #is a main fxn declared?
         
-		line.mainDeclaration()
+		mainDeclaration() #if not, look to see if this line declares it
 
     else:
         
-		line.searcher()
+		searcher(line) #if declared, look to see if anything valuable is on the line
 
-def mainDeclaration():
+def mainDeclaration(line):
 
     if mainDeclared == False: #main fxn has not been called yet
    
         if regexSearch = re.compile(r'''(
-            #(.*)                           #all the stuff before the main method
-            ()'static void main') ? #finds the main method
+            #(.*)                           
+            ()'static void main') ? 
             )''') == None):
-                
-				line.getNextLine()
+            #if main method not declared
+				getNextLine(line)
    
         else:
-        
+			#main has been declared
             mainDeclared = True
-            line.searcher()
+            searcher(line)
 
-def searcher():
+def searcher(line):
 
     if regexSearch = re.compile(r'''(
          (byte|sbyte|int|uint|short|ushort|long|ulong|float|double|char|decimal) #finds type if mainDeclaration
          )''') == None:
-         
-             line.variableChangeSearch()
+         #nothing declared, search to see if a variable changes
+             variableChangeSearch(line)
          
     else:
         
@@ -61,7 +73,7 @@ def searcher():
                 varValue[arrayIterator] = null
                 arrayIterator ++
 
-                line.makeJSON()
+                makeJSON()
 
             else:
 
@@ -71,7 +83,7 @@ def searcher():
 
                 varValue[arrayIterator] = group()
                 arrayIterator ++
-                line.makeJSON()
+                makeJSON()
 
 def variableChangeSearch():
 
@@ -159,6 +171,9 @@ def variableChangeSearch():
 
 		varValue[arrayIterator] = result
 				
-
+def makeJSON():
+	
+	#takes lineNumber, varType array, varName array, and varValue array and puts into JSON format
+	#sends JSON to frontend
 
 				
