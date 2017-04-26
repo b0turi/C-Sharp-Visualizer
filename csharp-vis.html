@@ -1,0 +1,282 @@
+<html>
+	<head>
+		<!-- External references to other libraries used in the frontend (jQuery, KnockoutJS, CodeMirror (CSS and JavaScript), Bootstrap CSS and JavaScript components) -->
+		<link href="font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
+		<link href="lib/codemirror.css" rel="stylesheet" >
+		<link href="bootstrap.min.css" rel="stylesheet">
+		<script src="jquery.js"></script>
+		<script src="knockout.js"></script>
+		<script src="lib/codemirror.js"></script>
+		<script src="bootstrap.min.js"></script>
+		<style>
+		/* classes used for styling */
+		body{
+			background-color: #551A8B;
+			font-family: "Trebuchet MS";
+		}
+		.main
+		{
+			position: relative;
+			top: 25px;
+		}
+		.inputarea
+		{
+			border: 2px solid #b8b8b8;
+			box-shadow: 0px 0px 5px #888888;
+		}
+		.circle
+		{
+			width: 30px;
+			height: 30px;
+			border-radius: 30px;
+			font-size: 20px;
+			padding: 0px;
+		}
+		.bar
+		{
+			height: 10px;
+			background-color: #c6c6c6;
+			width: 88%;
+			border-radius: 5px;
+			margin: auto;
+			margin-top: 10px;
+		}
+		.tuple
+		{
+			pointer-events:none;
+			float: left;
+			margin: 15px;
+			font-family: "Courier New";
+		}
+		.highlighted
+		{
+			background-color: #f00;
+		}
+		</style>
+		<title>C# Visualizer</title>
+	</head>
+	<body>
+
+		<div class="container main" style="max-width: 1000px;">
+			<div class="list-group-item" style="margin-right: 15px; margin-left: 15px; background-color: #ccc;">
+				<p style="font-size: 36px; margin: 0px;">C# Visualizer</p>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<p>The C# Visualizer is a tool to help student and novice programmers ascertain a better understanding of the way that code that they write is interpreted by the machine and executed. You may use the sample code provided to see how the program works, or rewrite it.</p>
+					<h3>Input: <div onclick="runCode()" class="btn btn-warning pull-right" style="margin-top: -5px;">Run!</div></h3>
+					<div class="inputarea">
+						<textarea id="demotext">
+//A sample code snippet used for testing
+int valueA = 1;
+int valueB;
+static void Main(String[] args)
+{
+	int valueC = 2;
+	valueB = valueA + valueC;
+	int[] valArray = new int[4];
+	valArray[0] = valueA;
+	valArray[1] = doubleIt(valueC);
+	valArray[3] = doubleIt(doubleIt(valueB));
+	valArray[2] = valArray[3] - valueA;
+	if(valArray[0] > valArray[1])
+	{
+		for(int i = 0;i < valArray.length;i++)
+		{
+			valArray[i]--;
+		}
+	}
+	else
+	{
+		for(int i = 0;i < valArray.length;i++)
+		{
+			valArray[i]++;
+		}	
+	}
+	string resultString = "The final value of the last value is " + valArray[valArray.length];
+}
+int doubleIt(int value)
+{
+	return value * 2;
+}
+						</textarea>
+					</div>
+					
+
+				  	<div class="text-center" style="margin: 10px;">
+				  		<button id="fastBack" onclick="startOver()" class="btn btn-success" disabled><i class="fa fa-fast-backward"></i></button>
+				  		<button id="pauseBut" onclick="stopRunning()" class="btn btn-success" disabled><i class="fa fa-pause"></i></button><strong>
+				  		<span id="lineProg">Please Hit "Run!" to Start Visualization</span></strong>
+				  		<button id="playBut" onclick="startProg()" class="btn btn-success" disabled><i class="fa fa-play"></i></button>
+				  		<button id="fastForw" onclick="end()" class="btn btn-success" disabled><i class="fa fa-fast-forward"></i></button>
+				  	</div>
+				  	<div class="row" style="margin: 10px;">
+				  		<button id="leftProg" onclick="goBack()" class="btn btn-primary pull-left circle" disabled><i class="fa fa-chevron-circle-left"></i></button>
+				  		<button id="rightProg" onclick="advance()" class="btn btn-primary pull-right circle" disabled><i class="fa fa-chevron-circle-right"></i></button>
+				  		<div id="progBar" class="bar"></div>
+				  		<div id="progCirc" class="btn btn-default circle" style="position: relative; top: -20px; left: 100px; padding-top:4px; color: #ddd;"><i class="fa fa-dot-circle-o"></i></div>
+				  	</div>
+				  	<h3>Visualization:</h3>
+				  	<div id="vis-top"></div>
+				  	<script>
+				  		var currentLine = 1;
+				  		var maxLines = 1;
+				  		var running;
+				  		//Start 
+				    	var editor = CodeMirror.fromTextArea(document.getElementById("demotext"), {
+				      		lineNumbers: true,
+				      		matchBrackets: true,
+
+				    	});
+				    	function runCode()
+				    	{
+				    		var text = editor.getValue();
+				    		$.ajax({
+							  type: "GET",
+							  url: "cgi-bin/testPy.py",
+							  data: { param: text},
+							  success: function(data) {
+							  	loadJSON(data);
+							  },
+							  error: function(request, status, error){
+							  	console.log("it didn't work");
+							  }
+							});
+				    		$("#loading").show();
+				    		$("#loadingBG").show();
+				    		$("#rightProg").prop('disabled', false);
+				    		$("#leftProg").prop('disabled', false);
+				    		$("#fastBack").prop('disabled', false);
+				    		$("#pauseBut").prop('disabled', false);
+				    		$("#playBut").prop('disabled', false);
+				    		$("#fastForw").prop('disabled', false);
+				    	}
+				    	var counter = 0;
+				    	var data;
+				    	function loadJSON(str)
+				    	{
+				    		data = JSON.parse(str);
+				    		maxLines = data["lines"].length;
+					    	document.getElementById("vis-top").innerHTML = "";
+
+				    		var variable = data["lines"][currentLine-1][currentLine+""];
+				    		disp(variable);
+							$("#loading").hide();
+							$("#loadingBG").hide();
+				    	}
+				    	function startProg()
+				    	{
+				    		running = setInterval(advance,1000);
+				    	}
+				    	function stopRunning()
+				    	{
+				    		if(running != undefined)
+				    			clearInterval(running);
+				    	}
+				    	function startOver()
+				    	{
+				    		stopRunning();
+				    		currentLine = 1;
+				    		disp(data["lines"][0]["1"]);
+				    	}
+				    	function end()
+				    	{
+				    		stopRunning();
+				    		currentLine = maxLines;
+				    		disp(data["lines"][maxLines-1][maxLines+""]);
+				    	}
+				    	function disp(variable)
+				    	{
+				    		if(!variable.hasOwnProperty("keep"))
+				    		{
+				    			document.getElementById("vis-top").innerHTML = "";
+				    			displayVariable(variable);
+				    		}
+				    		var lineNum = parseInt(variable["lineNumber"])-1;
+        					var myEditor = $(".CodeMirror");
+				    		var cmEdit = myEditor[0].CodeMirror;
+				    		for(var i = 0;i< cmEdit.lineCount(); i++)
+								cmEdit.removeLineClass(i, 'background', 'highlighted');
+				    		cmEdit.addLineClass(lineNum, 'background', 'highlighted');
+				    		cmEdit.scrollIntoView({"line":lineNum, "ch":0});
+							document.getElementById("lineProg").innerText = currentLine+" / "+maxLines;
+							var barWid = $("#progBar").width();
+							console.log(barWid);
+							document.getElementById("progCirc").style.left = ((currentLine/maxLines)*barWid-15)+"px";
+				    	}
+				    	function advance()
+				    	{
+				    		currentLine++;
+				    		if(currentLine>maxLines)
+				    			currentLine = 1;
+				    		
+				    		disp(data["lines"][currentLine-1][currentLine+""]);
+				    	}
+				    	function goBack()
+				    	{
+				    		currentLine--;
+				    		if(currentLine<1)
+				    			currentLine = maxLines;
+				    		disp(data["lines"][currentLine-1][currentLine+""]);
+				    	}
+				    	var addString = "";
+				    	function displayVariable(variable, isSub = false, arrName)
+				    	{
+							for(var value in variable)
+				    		{
+						    		//Get the name and type of the variable
+						    		var nameType = value+"";
+						    		//Gives the value of the key (variable in the code)
+						    		var tempval = variable[value];
+
+				    				//Set nameType to display value
+				    				if(nameType.charAt(0)=='S')
+				    				{
+				    					nameType += ' (<span style="color: #00f;">string</span>)';
+						    			tempval = '"'+tempval+'"';
+				    				}
+				    				if(nameType.charAt(0)=='I')
+				    					nameType += ' (<span style="color: #00f;">int</span>)';
+
+				    				if(nameType.charAt(0)=='A')
+				    				{
+				    					var length = parseInt(nameType.substring(nameType.indexOf("#")+1, nameType.lastIndexOf("#")));
+				    					var digitCount = nameType.substring(nameType.indexOf("#")+1, nameType.lastIndexOf("#")).length;
+				    					displayVariable(tempval, true, nameType.substring(digitCount + 3));
+				    					nameType += ' (array of length '+length+')';
+				    					addString = '<div class="btn-toolbar tuple" style="background-color: #eee; border-radius: 5px;"><div style="background-color:#aaa; width: 100%; text-align: center; border-radius: 5px 5px 0px 0px;"><b>'+nameType.substring(digitCount + 3)+'</b></div>' + addString;
+				    					for(var i = counter; i<length; i++)
+				    						addString += '<div class="btn-group-vertical" style="margin: 5px; background-color: #ddd; border: 5px solid #ddd; height: 77px; max-width: 170px;text-align: center; vertical-align: middle; line-height: 65px;">&emsp;&emsp;[empty]&emsp;&emsp;</div>';
+				    					addString += '</div>';
+				    					document.getElementById("vis-top").innerHTML += addString;
+				    					addString = "";
+				    				}else{
+					    				nameType = nameType.substring(1);
+					    				if(!isSub)
+											document.getElementById("vis-top").innerHTML += '<div class="btn-group tuple"><div class="btn btn-default" style="background-color:#ccc;"><b>'+nameType+'</b></div><div class="btn btn-default">'+tempval+'</div></div>';
+										else
+										{
+											var currentInd = parseInt(nameType.substring(0, nameType.indexOf(" ")));
+											while(counter < currentInd)
+											{
+												addString += '<div class="btn-group-vertical" style="margin: 5px; background-color: #ddd; border: 5px solid #ddd; height: 77px; max-width: 170px;text-align: center; vertical-align: middle; line-height: 65px;">&emsp;&emsp;[empty]&emsp;&emsp;</div>';
+				    							counter++;
+											}
+											addString += '<div class="btn-group-vertical" style="margin: 5px; background-color: #ddd; border: 5px solid #ddd; max-width: 170px;"><div class="btn btn-default" style="background-color:#ccc;"><b>'+arrName+'['+nameType.substring(0, nameType.indexOf(" "))+'] '+ nameType.substring( nameType.indexOf(" "))+ '</b></div><div class="btn btn-default">'+tempval+'</div></div>';
+										}
+									}
+					    			if(isSub)
+					    				counter++;
+					    			else
+					    				counter = 0;
+							}
+				    	}
+				  	</script>
+				</div>
+			</div>
+		</div>
+		<div id="loadingBG" style="position: fixed; z-index: 9999; top: 0px; left: 0px; background-color: #000; height: 100%; width: 100%; opacity: 0.3;" hidden></div>
+		<div id="loading" style="position: fixed; top: 50%; left: 50%; margin: -69px;" hidden><h1><i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+		<span class="sr-only">Loading...</span></h1></div>
+	</body>
+</html>
