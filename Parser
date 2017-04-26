@@ -1,5 +1,7 @@
 import re
 import json
+import cgitb; cgitb.enable()
+import cgi
 
 class Parser:
 
@@ -179,8 +181,9 @@ class Parser:
 
         p = Parser.parser()
         p.lineNumber = 0
-        with open("file.txt", "r+") as f:
-            while (not(f.next() is None) and (p.lineNumber <= 300)):
-                p.getNextLine(f.next())
-                p.lineNumber += 1
-            f.close()
+        dataFromJS = cgi.FieldStorage()
+        codeLines = dataFromJS.list[0].value.split('\n')
+        while (len(codeLines) > 0 and (p.lineNumber <= 300)):
+            p.getNextLine(codeLines[0])
+            codeLines.pop(0)
+            p.lineNumber += 1
