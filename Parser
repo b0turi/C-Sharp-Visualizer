@@ -31,19 +31,12 @@ class Parser:
 
     def mainDeclaration(line):
 
-        if mainDeclared == False: #main fxn has not been called yet
-
-            if re.compile(r'''(
+            if not (re.compile(r'''(
                 #(.*)
                 ()'static void main') ?
-                ''') is None:
-                #if main method not declared
-                    getNextLine(line)
-
-            else:
+                ''') is None):
             #main has been declared
                 mainDeclared = True
-                searcher(line)
 
     def searcher(line):
 
