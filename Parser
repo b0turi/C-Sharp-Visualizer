@@ -23,7 +23,7 @@ class Parser:
 
         if mainDeclared == False: #is a main fxn declared?
 
-            mainDeclaration() #if not, look to see if this line declares it
+            mainDeclaration(line) #if not, look to see if this line declares it
 
         else:
 
@@ -49,24 +49,20 @@ class Parser:
         else:
 
             varType = group()
-
             regexSearch = re.compile(r'''(
                 (\w+)   #find variable name
             )''')
 
             varName[arrayIterator] = group()
-
             if re.compile(r'''(
                          (=)?    #does the variable have a value declared?
                           )''') is None:
 
                 varValue[arrayIterator] = None
                 arrayIterator += 1
-
                 makeJSON()
 
             else:
-
                 regexSearch = re.compile(r'''(
                     (\w+)   #find the name
                 )''')
@@ -75,7 +71,7 @@ class Parser:
                 arrayIterator += 1
                 makeJSON()
 
-    def variableChangeSearch():
+    def variableChangeSearch(line):
 
         regexSearch = re.compile(r'''(
                                 (\w+)   #find the name; group 1
