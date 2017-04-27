@@ -100,7 +100,7 @@ def variableChangeSearch(line):
                                     (\+|-)
                                       \s*)*
                                      )''')
-        m = regx.match(line)
+        m = regx.findAll(regx, line)
     operators = (len(m.group(0)) - 1) / 2 #number of operators
     varsUsed = m.group(1)
     opsUsed = m.group(2)
