@@ -85,8 +85,9 @@ class Parser:
                                 (\w*)	#any variables used in equation; group 5
                                  )''')
 
-
+        #Check to see if the variable is already declared
         found = False
+
 
         i = 0
         while (i < arrayIterator):
@@ -100,6 +101,7 @@ class Parser:
 
                 i += 1
 
+        #Check for "++" and "--" operators
         if found and (group(5) is None):
 
             if group(3) == '++':
@@ -127,6 +129,7 @@ class Parser:
         varsUsed = group(1)
         opsUsed = group(2)
 
+        #see which, if any previous variables are used in the equation
         j = 0
 
         while j < len(varsUsed):
@@ -145,6 +148,7 @@ class Parser:
 
         result = varsUsed[0]
 
+        #Check which of operators "+" "-" "*" "/" "+=" and "-=" are used
         j = 0
 
         while j < len(opsUsed):
