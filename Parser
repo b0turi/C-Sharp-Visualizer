@@ -197,3 +197,5 @@ class Parser:
             p.getNextLine(codeLines[0])
             codeLines.pop(0)
             p.lineNumber += 1
+
+    main()
