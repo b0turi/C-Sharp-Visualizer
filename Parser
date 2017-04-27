@@ -87,91 +87,57 @@ class Parser:
 
         #Check to see if the variable is already declared
         found = False
-
-
         i = 0
         while (i < arrayIterator):
-
             if (varName[i] == group(1)):
-
                 i = arrayIterator
                 found = True
-
             else:
-
                 i += 1
 
         #Check for "++" and "--" operators
         if found and (group(5) is None):
-
             if group(3) == '++':
-
                 if isinstance(varType[arrayIterator], types.StringTypes):
-
                     varValue[arrayIterator] += 1
-
         elif group(3) == '--':
-
             if isinstance(varType[arrayIterator], types.StringTypes):
-
                 varValue[arrayIterator] -= 1
-
         elif found:
-
             regexSearch = re.compile(r'''(
                                     ((\w*)
                                       \s*
                                     (\+|-)
                                       \s*)*
                                      )''')
-
         operators = (len(group(0)) - 1) / 2 #number of operators
         varsUsed = group(1)
         opsUsed = group(2)
 
         #see which, if any previous variables are used in the equation
         j = 0
-
         while j < len(varsUsed):
-
             if isinstance(varsUsed[j], types.StringTypes):
-
                 k = 0
-
                 while k < len(varName):
-
                     if varName[k] == varsUsed[j]:
-
                         varsUsed[j] = varValue[k]
                     k += 1
             j += 1
-
         result = varsUsed[0]
 
         #Check which of operators "+" "-" "*" "/" "+=" and "-=" are used
         j = 0
-
         while j < len(opsUsed):
-
             if opsUsed[j] == '+':
-
                 result = result + varsUsed[j + 1]
-
             elif opsUsed[j] == '-':
-
                 result = result - varsUsed[j + 1]
-
             elif opsUsed[j] == '*':
-
                 result = result * varsUsed[j + 1]
-
             elif opsUsed[j] == '/':
-
                 result = result / varsUsed[j + 1]
-
-
             j += 1
-
         self.varValue[self.arrayIterator] = result
 
     def makeJSON():
