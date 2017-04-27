@@ -2,159 +2,160 @@
 import re
 import json
 import cgitb; cgitb.enable()
+import types
 import cgi
 
-class Parser:
+global mainDeclared
+global varType
+global varName
+global varValue
+global arrayIterator
 
-    mainDeclared = False
-    varType = []
-    varName = []
-    varValue = []
-    arrayIterator = 0
-    lineNumber = 0
-    outputFile = 'output.txt'
+def getNextLine(line):
 
+    if mainDeclared == False: #is a main fxn declared?
 
-    def __init__(self, outputFile='output.txt'):
-        if not(outputFile is None):
-            self.outputFile = outputFile
+        mainDeclaration(line) #if not, look to see if this line declares it
 
-    def getNextLine(line):
+    else:
 
-        if mainDeclared == False: #is a main fxn declared?
+        searcher(line) #if declared, look to see if anything valuable is on the line
 
-            mainDeclaration(line) #if not, look to see if this line declares it
+def mainDeclaration(line):
 
-        else:
-
-            searcher(line) #if declared, look to see if anything valuable is on the line
-
-    def mainDeclaration(line):
-
-            if not (re.compile(r'''(
+    regx = re.compile(r'''(
                 #(.*)
                 ()'static void main') ?
-                ''') is None):
-            #main has been declared
-                mainDeclared = True
+                ''')
+    if not (regx.match(line) is None):
+        #main has been declared
+        mainDeclared = True
 
-    def searcher(line):
+def searcher(line):
 
-        if re.compile(r'''(
+    regx = re.compile(r'''(
              (byte|sbyte|int|uint|short|ushort|long|ulong|float|double|char|decimal) #finds type if mainDeclaration
-             )''') is None:
-             #nothing declared, search to see if a variable changes
-                 variableChangeSearch(line)
+             )''')
+    if regx.match(line) is None:
+        #nothing declared, search to see if a variable changes
+        variableChangeSearch(line)
 
-        else:
+    else:
 
-            varType = group()
-            regexSearch = re.compile(r'''(
+        varType = regx.match.group(0)
+        regx = re.compile(r'''(
                 (\w+)   #find variable name
             )''')
-
-            varName[arrayIterator] = group()
-            if re.compile(r'''(
+        varName[arrayIterator] = regx.match(line).group(0)
+        regx = re.compile(r'''(
                          (=)?    #does the variable have a value declared?
-                          )''') is None:
+                          )''')
+        if regx.match(line) is None:
 
-                varValue[arrayIterator] = None
-                arrayIterator += 1
-                makeJSON()
+            varValue[arrayIterator] = None
+            arrayIterator += 1
+            makeJSON()
 
-            else:
-                regexSearch = re.compile(r'''(
-                    (\w+)   #find the name
+        else:
+            regx = re.compile(r'''(
+                    (\w+)   #find the value
                 )''')
 
-                varValue[arrayIterator] = group()
-                arrayIterator += 1
-                makeJSON()
+            varValue[arrayIterator] = regx.match(line).group(0)
+            arrayIterator += 1
+            makeJSON()
 
-    def variableChangeSearch(line):
+def variableChangeSearch(line):
 
-        regexSearch = re.compile(r'''(
+    regx = re.compile(r'''(
                                 (\w+)   #find the name; group 1
                                 (\s*)   #0 or more spaces; group 2
                                 (=|\+\+|--) #equals sign, plus plus, or minus minus; group 3
                                 (\s*)	#pasrse out the spaces; group 4
                                 (\w*)	#any variables used in equation; group 5
                                  )''')
+    m = regx.match()
+    #Check to see if the variable is already declared
+    found = False
+    i = 0
+    while (i < arrayIterator):
+        if (varName[i] == m.group(1)):
+            i = arrayIterator
+            found = True
+        else:
+            i += 1
 
-        #Check to see if the variable is already declared
-        found = False
-        i = 0
-        while (i < arrayIterator):
-            if (varName[i] == group(1)):
-                i = arrayIterator
-                found = True
-            else:
-                i += 1
-
-        #Check for "++" and "--" operators
-        if found and (group(5) is None):
-            if group(3) == '++':
-                if isinstance(varType[arrayIterator], types.StringTypes):
-                    varValue[arrayIterator] += 1
-        elif group(3) == '--':
+    #Check for "++" and "--" operators
+    if found and (m.group(5) is None):
+        if m.group(3) == '++':
             if isinstance(varType[arrayIterator], types.StringTypes):
-                varValue[arrayIterator] -= 1
-        elif found:
-            regexSearch = re.compile(r'''(
+                varValue[arrayIterator] += 1
+    elif m.group(3) == '--':
+        if isinstance(varType[arrayIterator], types.StringTypes):
+            varValue[arrayIterator] -= 1
+    elif found:
+        regx = re.compile(r'''(
                                     ((\w*)
                                       \s*
                                     (\+|-)
                                       \s*)*
                                      )''')
-        operators = (len(group(0)) - 1) / 2 #number of operators
-        varsUsed = group(1)
-        opsUsed = group(2)
+        m = regx.match(line)
+    operators = (len(m.group(0)) - 1) / 2 #number of operators
+    varsUsed = m.group(1)
+    opsUsed = m.group(2)
 
-        #see which, if any previous variables are used in the equation
-        j = 0
-        while j < len(varsUsed):
-            if isinstance(varsUsed[j], types.StringTypes):
-                k = 0
-                while k < len(varName):
-                    if varName[k] == varsUsed[j]:
-                        varsUsed[j] = varValue[k]
-                    k += 1
-            j += 1
-        result = varsUsed[0]
+    #see which, if any previous variables are used in the equation
+    j = 0
+    while j < len(varsUsed):
+        if isinstance(varsUsed[j], types.StringTypes):
+            k = 0
+            while k < len(varName):
+                if varName[k] == varsUsed[j]:
+                    varsUsed[j] = varValue[k]
+                k += 1
+        j += 1
+    result = varsUsed[0]
 
-        #Check which of operators "+" "-" "*" "/" "+=" and "-=" are used
-        j = 0
-        while j < len(opsUsed):
-            if opsUsed[j] == '+':
-                result = result + varsUsed[j + 1]
-            elif opsUsed[j] == '-':
-                result = result - varsUsed[j + 1]
-            elif opsUsed[j] == '*':
-                result = result * varsUsed[j + 1]
-            elif opsUsed[j] == '/':
-                result = result / varsUsed[j + 1]
-            j += 1
-        self.varValue[self.arrayIterator] = result
+    #Check which of operators "+" "-" "*" "/" "+=" and "-=" are used
+    j = 0
+    while j < len(opsUsed):
+        if opsUsed[j] == '+':
+            result = result + varsUsed[j + 1]
+        elif opsUsed[j] == '-':
+            result = result - varsUsed[j + 1]
+        elif opsUsed[j] == '*':
+            result = result * varsUsed[j + 1]
+        elif opsUsed[j] == '/':
+            result = result / varsUsed[j + 1]
+        j += 1
+    varValue[arrayIterator] = result
 
-    def makeJSON():
+def makeJSON():
 
-        data = [lineNumber, varType, varName, varValue]
-        with open('output.txt', 'r+') as outputFile:
-            json.dump(data, outfile)
-        outputFile.close()
+    data = [lineNumber, varType, varName, varValue]
+    with open('output.txt', 'r+') as outputFile:
+        json.dump(data, outputFile)
+    outputFile.close()
 
-        #takes lineNumber, varType array, varName array, and varValue array and puts into JSON format
-        #sends JSON to frontend
+    #takes lineNumber, varType array, varName array, and varValue array and puts into JSON format
+    #sends JSON to frontend
 
-    def main(self): #iterate through lines of textfile
 
-        p = Parser.parser()
-        p.lineNumber = 0
-        dataFromJS = cgi.FieldStorage()
-        codeLines = dataFromJS.list[0].value.split('\n')
-        while (len(codeLines) > 0 and (p.lineNumber <= 300)):
-            p.getNextLine(codeLines[0])
-            codeLines.pop(0)
-            p.lineNumber += 1
+#iterate through lines of textfile
+mainDeclared = False
+varType = []
+varName = []
+varValue = []
+arrayIterator = 0
 
-    main()
+lineNumber = 0
+outputFile = 'output.txt'
+dataFromJS = cgi.FieldStorage()
+codeLines = dataFromJS.list[0].value.split('\n')
+while (len(codeLines) > 0 and (lineNumber <= 300)):
+    getNextLine(codeLines[0])
+    codeLines.pop(0)
+    lineNumber += 1
+
+
