@@ -130,6 +130,7 @@ def variableChangeSearch(line):
             result = result / varsUsed[j + 1]
         j += 1
     varValue[arrayIterator] = result
+    makeJSON()
 
 def makeJSON():
 
