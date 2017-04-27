@@ -90,9 +90,9 @@ def variableChangeSearch(line):
         if m.group(3) == '++':
             if isinstance(varType[arrayIterator], types.StringTypes):
                 varValue[arrayIterator] += 1
-    elif m.group(3) == '--':
-        if isinstance(varType[arrayIterator], types.StringTypes):
-            varValue[arrayIterator] -= 1
+        elif m.group(3) == '--':
+            if isinstance(varType[arrayIterator], types.StringTypes):
+                varValue[arrayIterator] -= 1
     elif found:
         regx = re.compile(r'''(
                                     ((\w*)
