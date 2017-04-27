@@ -80,7 +80,7 @@ def variableChangeSearch(line):
     i = 0
     while (i < arrayIterator):
         if (varName[i] == m.group(1)):
-            i = arrayIterator
+            break
             found = True
         else:
             i += 1
@@ -88,11 +88,11 @@ def variableChangeSearch(line):
     #Check for "++" and "--" operators
     if found and (m.group(5) is None):
         if m.group(3) == '++':
-            if isinstance(varType[arrayIterator], types.StringTypes):
-                varValue[arrayIterator] += 1
+            if isinstance(varType[i], types.StringTypes):
+                varValue[i] += 1
         elif m.group(3) == '--':
-            if isinstance(varType[arrayIterator], types.StringTypes):
-                varValue[arrayIterator] -= 1
+            if isinstance(varType[i], types.StringTypes):
+                varValue[i] -= 1
     elif found:
         regx = re.compile(r'''(
                                     ((\w*)
