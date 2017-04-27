@@ -80,8 +80,8 @@ def variableChangeSearch(line):
     i = 0
     while (i < arrayIterator):
         if (varName[i] == m.group(1)):
-            break
             found = True
+            break
         else:
             i += 1
 
