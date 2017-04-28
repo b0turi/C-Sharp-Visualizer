@@ -105,7 +105,7 @@ def variableChangeSearch(line):
         varsUsed = m.group(1)
         opsUsed = m.group(2)
 
-    #if type changes to type string, change the value of previously stored variable
+    #in new array stores all to-be-used variable names to their value in the varsUsed array
     j = 0
     while j < len(varsUsed):
         if isinstance(varsUsed[j], types.StringTypes):
