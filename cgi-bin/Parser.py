@@ -38,7 +38,7 @@ def variableChangeSearch(lineNum):
         return
     line = codeLines[lineNum]
     line = untab(line)  
-    if line.find(';') == -1 or getNextLine(line, lineNum):
+    if line.find(';') == -1 or getNextLine(line, lineNum) or line[:2] == "//":
         variableChangeSearch(lineNum+1)
         return
     firstWord = line[:line.find(' ')]
@@ -86,26 +86,26 @@ def variableChangeSearch(lineNum):
         #If the left hand side is only one value, adjust the value accordingly
         if affectingVar == -1:
             if operation == "=":
-                allVars[affectedVar][1] = tempOp
+                allVars[affectedVar][1] = int(tempOp)
             if operation == "+=":
-                allVars[affectedVar][1] += tempOp
+                allVars[affectedVar][1] += int(tempOp)
             if operation == "-=":
-                allVars[affectedVar][1] -= tempOp
+                allVars[affectedVar][1] -= int(tempOp)
             if operation == "*=":
-                allVars[affectedVar][1] *= tempOp
+                allVars[affectedVar][1] *= int(tempOp)
             if operation == "/=":
-                allVars[affectedVar][1] /= tempOp
+                allVars[affectedVar][1] /= int(tempOp)
         else:
             if operation == "=":
-                allVars[affectedVar][1] = allVars[affectingVar][1]
+                allVars[affectedVar][1] = int(allVars[affectingVar][1])
             if operation == "+=":
-                allVars[affectedVar][1] += allVars[affectingVar][1]
+                allVars[affectedVar][1] += int(allVars[affectingVar][1])
             if operation == "-=":
-                allVars[affectedVar][1] -= allVars[affectingVar][1]
+                allVars[affectedVar][1] -= int(allVars[affectingVar][1])
             if operation == "*=":
-                allVars[affectedVar][1] *= allVars[affectingVar][1]
+                allVars[affectedVar][1] *= int(allVars[affectingVar][1])
             if operation == "/=":
-                allVars[affectedVar][1] /= allVars[affectingVar][1]
+                allVars[affectedVar][1] /= int(allVars[affectingVar][1])
 
     if len(opVars) == 2:
         #Given that the RHS has 2 values, check if either, both, or neither of them are variables
@@ -130,22 +130,22 @@ def variableChangeSearch(lineNum):
         #If the second value isn't a variable
         if affectingVar2 == -1:
             if otherOp == "+":
-                lhs += opVars[1]
+                lhs += int(opVars[1])
             if otherOp == "-":
-                lhs -= opVars[1]
+                lhs -= int(opVars[1])
             if otherOp == "*":
-                lhs *= opVars[1]
+                lhs *= int(opVars[1])
             if otherOp == "/":
-                lhs /= opVars[1]
+                lhs /= int(opVars[1])
         else:
             if otherOp == "+":
-                lhs += allVars[affectingVar2][1]
+                lhs += int(allVars[affectingVar2][1])
             if otherOp == "-":
-                lhs -= allVars[affectingVar2][1]
+                lhs -= int(allVars[affectingVar2][1])
             if otherOp == "*":
-                lhs *= allVars[affectingVar2][1]
+                lhs *= int(allVars[affectingVar2][1])
             if otherOp == "/":
-                lhs /= allVars[affectingVar2][1]
+                lhs /= int(allVars[affectingVar2][1])
 
         #add the operations completed on the RHS to the LHS with whatever base operation
         if operation == "=":

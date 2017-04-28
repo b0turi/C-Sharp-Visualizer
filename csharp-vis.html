@@ -112,10 +112,21 @@ static void Main(String[] args)
 							  url: "cgi-bin/Parser.py",
 							  data: { param: text},
 							  success: function(data) {
-							  	loadJSON(data);
+							  	try{
+								  	loadJSON(data);
+								}catch(err)
+								{
+									$("#loading").hide();
+									$("#errorModal").modal('show');
+									$("#closeBut").on("click", function(){
+							    		console.log("hello");
+							    		$("#errorModal").modal('hide');
+							    		$("#loadingBG").hide();
+							    	});
+								}
 							  },
 							  error: function(request, status, error){
-							  	console.log("it didn't work");
+							  	
 							  }
 							});
 				    		$("#loading").show();
@@ -246,12 +257,28 @@ static void Main(String[] args)
 					    				counter = 0;
 							}
 				    	}
+
 				  	</script>
 				</div>
 			</div>
 		</div>
-		<div id="loadingBG" style="position: fixed; z-index: 9999; top: 0px; left: 0px; background-color: #000; height: 100%; width: 100%; opacity: 0.3;" hidden></div>
+		<script>
+
+		</script>
+		<div id="loadingBG" style="position: fixed; z-index: 9998; top: 0px; left: 0px; background-color: #000; height: 100%; width: 100%; opacity: 0.3;" hidden></div>
 		<div id="loading" style="position: fixed; top: 50%; left: 50%; margin: -69px;" hidden><h1><i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
 		<span class="sr-only">Loading...</span></h1></div>
+		<div class="modal fade" style="z-index: 9999;" id="errorModal" tabindex="-1" role="dialog">
+		  <div class="modal-dialog" style="background-color: #faa; border-radius: 8px;" role="document">
+		    <div class="modal-content alert alert-danger alert-dismissable">
+		    	<div class="modal-body" >
+	  				<h2>Uh oh!</h2>
+	  				<p>Looks like there was an error in your code. Please try to change some things around before you hit "Run!" again.</p>
+	  				<button class="btn btn-lg btn-danger pull-right" id="closeBut">OK</button>
+	  				<p>&nbsp</p>
+	  			</div>
+		    </div>
+		  </div>
+		</div>
 	</body>
 </html>
