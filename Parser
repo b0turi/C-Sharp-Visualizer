@@ -104,6 +104,7 @@ def variableChangeSearch(line):
         operators = (len(m.group(0)) - 1) / 2 #number of operators
         varsUsed = m.group(1)
         opsUsed = m.group(2)
+        varsNum = len(m.group(1))
 
     #in new array stores all to-be-used variable names to their value in the varsUsed array
     j = 0
@@ -119,7 +120,7 @@ def variableChangeSearch(line):
 
     #Check which of operators "+" "-" "*" "/" "+=" and "-=" are used
     j = 0
-    while j < len(opsUsed):
+    while (j + 1 < varsNum) and (j < len(opsUsed)):
         if opsUsed[j] == '+':
             result = result + varsUsed[j + 1]
         elif opsUsed[j] == '-':
