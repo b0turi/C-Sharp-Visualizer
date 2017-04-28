@@ -106,31 +106,32 @@ def variableChangeSearch(line):
         opsUsed = m.group(2)
         varsNum = len(m.group(1))
 
-    #in new array stores all to-be-used variable names to their value in the varsUsed array
-    j = 0
-    while j < len(varsUsed):
-        if isinstance(varsUsed[j], types.StringTypes):
-            k = 0
-            while k < len(varName):
-                if varName[k] == varsUsed[j]:
-                    varsUsed[j] = varValue[k]
-                k += 1
-        j += 1
-    result = varsUsed[0]
+        #in new array stores all to-be-used variable names to their value in the varsUsed array
+        j = 0
+        while j < len(varsUsed):
+            if isinstance(varsUsed[j], types.StringTypes):
+               k = 0
+               while k < len(varName):
+                    if varName[k] == varsUsed[j]:
+                        varsUsed[j] = varValue[k]
+                    k += 1
+            j += 1
+        result = varsUsed[0]
 
-    #Check which of operators "+" "-" "*" "/" "+=" and "-=" are used
-    j = 0
-    while (j + 1 < varsNum) and (j < len(opsUsed)):
-        if opsUsed[j] == '+':
-            result = result + varsUsed[j + 1]
-        elif opsUsed[j] == '-':
-            result = result - varsUsed[j + 1]
-        elif opsUsed[j] == '*':
-            result = result * varsUsed[j + 1]
-        elif opsUsed[j] == '/':
-            result = result / varsUsed[j + 1]
-        j += 1
-    varValue[arrayIterator] = result
+        #Check which of operators "+" "-" "*" "/" "+=" and "-=" are used
+        j = 0
+        while (j + 1 < varsNum) and (j < len(opsUsed)):
+            if opsUsed[j] == '+':
+                result = result + varsUsed[j + 1]
+            elif opsUsed[j] == '-':
+                result = result - varsUsed[j + 1]
+            elif opsUsed[j] == '*':
+                result = result * varsUsed[j + 1]
+            elif opsUsed[j] == '/':
+                result = result / varsUsed[j + 1]
+            j += 1
+        varValue[arrayIterator] = result
+        
     makeJSON()
 
 def makeJSON():
