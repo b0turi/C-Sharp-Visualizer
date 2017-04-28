@@ -1,11 +1,10 @@
 <html>
 	<head>
-		<!-- External references to other libraries used in the frontend (jQuery, KnockoutJS, CodeMirror (CSS and JavaScript), Bootstrap CSS and JavaScript components) -->
+		<!-- External references to other libraries used in the frontend (jQuery, CodeMirror (CSS and JavaScript), Bootstrap CSS and JavaScript components) -->
 		<link href="font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
 		<link href="lib/codemirror.css" rel="stylesheet" >
 		<link href="bootstrap.min.css" rel="stylesheet">
 		<script src="jquery.js"></script>
-		<script src="knockout.js"></script>
 		<script src="lib/codemirror.js"></script>
 		<script src="bootstrap.min.js"></script>
 		<style>
@@ -74,32 +73,9 @@ static void Main(String[] args)
 {
 	int valueC = 2;
 	valueB = valueA + valueC;
-	int[] valArray = new int[4];
-	valArray[0] = valueA;
-	valArray[1] = doubleIt(valueC);
-	valArray[3] = doubleIt(doubleIt(valueB));
-	valArray[2] = valArray[3] - valueA;
-	if(valArray[0] > valArray[1])
-	{
-		for(int i = 0;i < valArray.length;i++)
-		{
-			valArray[i]--;
-		}
-	}
-	else
-	{
-		for(int i = 0;i < valArray.length;i++)
-		{
-			valArray[i]++;
-		}	
-	}
-	string resultString = "The final value of the last value is " + valArray[valArray.length];
-}
-int doubleIt(int value)
-{
-	return value * 2;
-}
-						</textarea>
+	int valueD = -23;
+	valueD += valueB;
+}</textarea>
 					</div>
 					
 
@@ -136,8 +112,7 @@ int doubleIt(int value)
 							  url: "cgi-bin/Parser.py",
 							  data: { param: text},
 							  success: function(data) {
-							  	//loadJSON(data);
-							  	console.log(data);
+							  	loadJSON(data);
 							  },
 							  error: function(request, status, error){
 							  	console.log("it didn't work");
@@ -202,7 +177,6 @@ int doubleIt(int value)
 				    		cmEdit.scrollIntoView({"line":lineNum, "ch":0});
 							document.getElementById("lineProg").innerText = currentLine+" / "+maxLines;
 							var barWid = $("#progBar").width();
-							console.log(barWid);
 							document.getElementById("progCirc").style.left = ((currentLine/maxLines)*barWid-15)+"px";
 				    	}
 				    	function advance()
