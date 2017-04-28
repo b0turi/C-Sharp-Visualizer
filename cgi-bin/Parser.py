@@ -165,7 +165,7 @@ def variableChangeSearch(lineNum):
 def makeJSON(lineNum):
     global outputString
     global stepCounter
-    outputString += '{"'+str(stepCounter)+'": {"lineNumber": '+str(lineNum+1)+','
+    outputString += '{"'+str(stepCounter)+'": {"clineNumber": '+str(lineNum+1)+','
     for var in allVars:
         outputString += '"'+str(var[0])+'": '+str(var[1])+','
     outputString = outputString[:-1]

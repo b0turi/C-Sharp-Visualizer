@@ -168,7 +168,7 @@ static void Main(String[] args)
 				    			document.getElementById("vis-top").innerHTML = "";
 				    			displayVariable(variable);
 				    		}
-				    		var lineNum = parseInt(variable["lineNumber"])-1;
+				    		var lineNum = parseInt(variable["clineNumber"])-1;
         					var myEditor = $(".CodeMirror");
 				    		var cmEdit = myEditor[0].CodeMirror;
 				    		for(var i = 0;i< cmEdit.lineCount(); i++)
